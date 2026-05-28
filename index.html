@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUMS 2025 — Practice Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --card2: #1a2235;
+    --border: rgba(255,255,255,0.08);
+    --text: #e8eaf0;
+    --muted: #7a8499;
+    --accent: #4f9cf9;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --physics: #4f9cf9;
+    --chemistry: #a78bfa;
+    --english: #34d399;
+    --biology: #fb923c;
+    --radius: 16px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(79,156,249,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(167,139,250,0.06) 0%, transparent 50%);
+  }
+
+  .app { width: 100%; max-width: 780px; }
+
+  /* ── LANDING ── */
+  #landing {
+    text-align: center;
+    animation: fadeUp 0.6s ease both;
+  }
+  #landing .badge {
+    display: inline-block;
+    background: rgba(79,156,249,0.12);
+    border: 1px solid rgba(79,156,249,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+  #landing h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #e8eaf0 0%, #a78bfa 50%, #4f9cf9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #landing p {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 420px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+    text-align: left;
+  }
+  .subject-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .subject-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .subject-card .name { font-weight: 600; font-size: 0.9rem; }
+  .subject-card .count { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .btn-start {
+    background: linear-gradient(135deg, #4f9cf9, #a78bfa);
+    color: #fff;
+    border: none;
+    padding: 16px 48px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px rgba(79,156,249,0.3);
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(79,156,249,0.4); }
+
+  /* ── QUIZ ── */
+  #quiz { display: none; animation: fadeUp 0.4s ease both; }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+  .progress-wrap { flex: 1; }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-track {
+    height: 5px;
+    background: var(--card2);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f9cf9, #a78bfa);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+  .score-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--green);
+  }
+
+  .subject-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .q-number {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .q-text {
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    font-weight: 500;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .options-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .option-btn {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(79,156,249,0.06), rgba(167,139,250,0.06));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .option-btn:hover:not(:disabled)::before { opacity: 1; }
+  .option-btn:hover:not(:disabled) { border-color: rgba(79,156,249,0.4); transform: translateX(3px); }
+  .option-btn:disabled { cursor: default; }
+
+  .opt-label {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--card2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .option-btn.correct { border-color: var(--green); background: rgba(52,211,153,0.06); }
+  .option-btn.correct .opt-label { background: var(--green); color: #000; }
+  .option-btn.wrong { border-color: var(--red); background: rgba(248,113,113,0.06); }
+  .option-btn.wrong .opt-label { background: var(--red); color: #fff; }
+  .option-btn.reveal-correct { border-color: var(--green); background: rgba(52,211,153,0.04); }
+  .option-btn.reveal-correct .opt-label { background: rgba(52,211,153,0.2); color: var(--green); }
+
+  .explanation-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 16px;
+    animation: fadeUp 0.3s ease both;
+    display: none;
+  }
+  .explanation-card .expl-title { color: var(--accent); font-weight: 600; margin-bottom: 6px; font-size: 0.8rem; letter-spacing: 0.5px; }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .btn-nav {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-nav:hover { border-color: rgba(79,156,249,0.4); color: var(--accent); }
+  .btn-nav:disabled { opacity: 0.3; cursor: default; }
+  .btn-nav.primary {
+    background: linear-gradient(135deg, #4f9cf9, #a78bfa);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(79,156,249,0.25);
+  }
+  .btn-nav.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,156,249,0.35); }
+
+  /* ── RESULTS ── */
+  #results { display: none; animation: fadeUp 0.5s ease both; }
+  .result-hero {
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 48px 32px 40px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .score-ring {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(#4f9cf9 0deg, #a78bfa var(--deg), var(--card2) var(--deg));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+  .score-ring::before {
+    content: '';
+    width: 108px; height: 108px;
+    border-radius: 50%;
+    background: var(--card);
+    position: absolute;
+  }
+  .score-ring .ring-text {
+    position: relative; z-index: 1;
+    text-align: center;
+  }
+  .ring-pct { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; }
+  .ring-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .result-hero h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+  .result-hero .sub { color: var(--muted); font-size: 0.9rem; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-val { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; }
+  .stat-lab { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+  .subject-results { margin-bottom: 20px; }
+  .subject-results h3 { font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .subj-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .subj-row .s-name { font-weight: 600; font-size: 0.875rem; flex: 1; }
+  .subj-bar-wrap { flex: 2; height: 6px; background: var(--card2); border-radius: 100px; overflow: hidden; }
+  .subj-bar { height: 100%; border-radius: 100px; transition: width 0.8s ease; }
+  .subj-score { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+
+  .result-actions { display: flex; gap: 12px; justify-content: center; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 520px) {
+    .subject-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    .question-card { padding: 20px; }
+    .stat-val { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="badge">NUMS 2025</div>
+  <h1>Medical Entry<br>Test Practice</h1>
+  <p>Test your readiness with 123 real MCQs from the NUMS 2025 paper — Physics, Chemistry, English & Biology.</p>
+  <div class="subject-grid">
+    <div class="subject-card">
+      <div class="subject-dot" style="background:var(--physics)"></div>
+      <div><div class="name">Physics</div><div class="count">Questions 28–30 (3 Qs)</div></div>
+    </div>
+    <div class="subject-card">
+      <div class="subject-dot" style="background:var(--chemistry)"></div>
+      <div><div class="name">Chemistry</div><div class="count">Questions 31–70 (40 Qs)</div></div>
+    </div>
+    <div class="subject-card">
+      <div class="subject-dot" style="background:var(--english)"></div>
+      <div><div class="name">English</div><div class="count">Questions 71–85 (15 Qs)</div></div>
+    </div>
+    <div class="subject-card">
+      <div class="subject-dot" style="background:var(--biology)"></div>
+      <div><div class="name">Biology</div><div class="count">Questions 86–150 (65 Qs)</div></div>
+    </div>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">Start Quiz →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="top-bar">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="qCounter">Question 1 of 123</span>
+        <span id="subjLabel"></span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="score-chip" id="scoreChip">Score: 0</div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-number" id="qNum">Q1</div>
+    <div class="q-text" id="qText"></div>
+  </div>
+
+  <div class="options-grid" id="optionsGrid"></div>
+  <div class="explanation-card" id="explanationCard">
+    <div class="expl-title">💡 Explanation</div>
+    <div id="explanationText"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn-nav" id="btnPrev" onclick="navigate(-1)" disabled>← Previous</button>
+    <button class="btn-nav primary" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="result-hero">
+    <div class="score-ring" id="scoreRing">
+      <div class="ring-text">
+        <div class="ring-pct" id="ringPct">0%</div>
+        <div class="ring-label">Score</div>
+      </div>
+    </div>
+    <h2 id="resultTitle">Well Done!</h2>
+    <div class="sub" id="resultSub"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val" id="statCorrect" style="color:var(--green)">0</div>
+      <div class="stat-lab">Correct</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statWrong" style="color:var(--red)">0</div>
+      <div class="stat-lab">Wrong</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="statSkipped" style="color:var(--yellow)">0</div>
+      <div class="stat-lab">Skipped</div>
+    </div>
+  </div>
+  <div class="subject-results">
+    <h3>By Subject</h3>
+    <div id="subjectBreakdown"></div>
+  </div>
+  <div class="result-actions">
+    <button class="btn-nav" onclick="location.reload()">← Back to Home</button>
+    <button class="btn-nav primary" onclick="restartQuiz()">Restart Quiz</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ── PHYSICS ──
+  {s:"Physics",q:"The path of a charged particle in a plane perpendicular to a uniform magnetic field is:",o:["Circular","Helical","Parabola","Elliptical"],a:0,e:"A charged particle moving perpendicular to a uniform magnetic field experiences a constant centripetal force, causing it to move in a circular path."},
+  {s:"Physics",q:"Magnetic force acting on a charge at rest is:",o:["Zero","Positive","Negative","Infinite"],a:0,e:"The magnetic force is F = qv × B. When velocity v = 0 (charge at rest), the force is zero regardless of the field strength."},
+  {s:"Physics",q:"If mass of a charged particle is doubled, cyclotron frequency becomes:",o:["Doubled","Halved","Quadrupled","One fourth"],a:1,e:"Cyclotron frequency f = qB/(2πm). Since frequency is inversely proportional to mass, doubling the mass halves the cyclotron frequency."},
+
+  // ── CHEMISTRY ──
+  {s:"Chemistry",q:"Most molecular crystals melt below:",o:["200°C","280°C","330°C","480°C"],a:0,e:"Molecular crystals are held together by weak van der Waals forces or hydrogen bonds, giving them low melting points — most below 200°C."},
+  {s:"Chemistry",q:"How much heavier is the H-atom as compared to electron?",o:["1937","1737","1837","1637"],a:2,e:"A hydrogen atom consists of one proton and one electron. The proton-to-electron mass ratio is approximately 1836, so the H-atom is about 1837 times heavier than an electron."},
+  {s:"Chemistry",q:"The value of equilibrium constant for the decomposition of ozone at 25°C:",o:["10⁵⁵","10⁶⁵","10²⁵","10⁵⁰"],a:1,e:"The decomposition of ozone (2O₃ → 3O₂) is highly spontaneous with a very large equilibrium constant, approximately 10⁶⁵ at 25°C, indicating nearly complete decomposition."},
+  {s:"Chemistry",q:"A reaction is first order with respect to A and third order with respect to B, the rate equation is:",o:["Rate = K[A][B]²","Rate = K[A]²[B]","Rate = K[A][B]³","Rate = K[A]"],a:2,e:"The rate equation reflects the order with respect to each reactant. First order in A means [A]¹, third order in B means [B]³, giving Rate = K[A][B]³."},
+  {s:"Chemistry",q:"For a reaction A → Product, if concentration of A is doubled, product increases 4 times. The order of reaction will be:",o:["Zero","1st","2nd","3rd"],a:2,e:"If doubling concentration quadruples the rate (2² = 4), the reaction is second order. Rate = K[A]², so 2² = 4-fold increase."},
+  {s:"Chemistry",q:"Select the spontaneous reaction from the following:",o:["Reaction of nitrogen and oxygen","Emission of α-particles from polonium","Thermal decomposition of marble","Burning of paper"],a:3,e:"Burning of paper is a spontaneous exothermic combustion reaction (ΔG < 0). It occurs naturally once initiated without continuous energy input."},
+  {s:"Chemistry",q:"Select the exothermic reaction among the following:",o:["Thermal composition of P₂O₅","Formation of atmospheric nitric oxide","Burning of methane","Sublimation of dry ice"],a:2,e:"Burning of methane (CH₄ + 2O₂ → CO₂ + 2H₂O) releases energy as heat and light — a classic exothermic combustion reaction."},
+  {s:"Chemistry",q:"The oxidation number of Cl in HClO₂ is:",o:["+1","+3","+5","+7"],a:1,e:"In HClO₂: H = +1, each O = −2. So: +1 + Cl + 2(−2) = 0 → Cl = +3."},
+  {s:"Chemistry",q:"Bond order is equal to:",o:["Difference between number of bonding electrons and antibonding electrons","The sum of number of bonding electrons and antibonding electrons","Half of the difference between number of bonding electrons and antibonding electrons","Quarter of the difference between number of bonding electrons and antibonding electrons"],a:2,e:"Bond order = (bonding electrons − antibonding electrons) / 2. This is the standard molecular orbital theory definition."},
+  {s:"Chemistry",q:"Which of the following molecule has non-polar covalent bond?",o:["Methyl chloride","Methanol","Carbon dioxide","Tetrachloromethane"],a:3,e:"CCl₄ (tetrachloromethane) is symmetrical — the four C-Cl bonds are polar but their dipoles cancel due to tetrahedral geometry, giving a non-polar molecule overall."},
+  {s:"Chemistry",q:"Which of the following alcohols will give oily layer upon heating?",o:["3-Methyl-2-butanol","2-Methyl-2-butanol","2-Butanol","Ethyl alcohol"],a:1,e:"2-Methyl-2-butanol is a tertiary alcohol. In the Lucas test, tertiary alcohols react fastest with ZnCl₂/HCl to immediately form an oily layer (alkyl chloride)."},
+  {s:"Chemistry",q:"Formalin is a mixture of:",o:["40% HCHO, 8% CH₃OH, 52% H₂O","40% CH₃CHO, 8% CH₃OH, 50% H₂O","40% CH₃CHO, 8% C₂H₅OH, 50% H₂O","45% HCHO, 8% C₂H₅OH, 50%H₂O"],a:0,e:"Formalin is an aqueous solution of formaldehyde: 40% HCHO, 8% methanol (as stabilizer to prevent polymerization), and 52% water."},
+  {s:"Chemistry",q:"Polymerization of HCHO and CH₃CHO occurs in the presence of:",o:["Conc. H₂SO₄","Dil. H₂SO₄","Conc. H₂CO₃","Dil. H₂CO₃"],a:0,e:"Concentrated H₂SO₄ acts as a catalyst for the polymerization (condensation) of formaldehyde and acetaldehyde."},
+  {s:"Chemistry",q:"The boiling point of carboxylic acids are relatively high due to:",o:["Increased molecular mass","Intermolecular carbon bonding","Intermolecular oxygen bonding","Intermolecular hydrogen bonding"],a:3,e:"Carboxylic acids have unusually high boiling points because they form intermolecular hydrogen bonds between the O-H groups, and even exist as dimers."},
+  {s:"Chemistry",q:"Carboxylic acid reacts with metal carbonate. The colorless gas evolved is:",o:["H₂","O₂","CO₂","CO"],a:2,e:"RCOOH + Na₂CO₃ → RCOONa + H₂O + CO₂. The colorless gas that turns limewater milky is CO₂."},
+  {s:"Chemistry",q:"Which of the following compound will react with 2,2-dimethyl propanoic acid to produce ester?",o:["Ethanoic acid","Propane","Ethanol","Propanone"],a:2,e:"Esterification occurs between a carboxylic acid and an alcohol. Ethanol reacts with the acid to form an ester and water."},
+  {s:"Chemistry",q:"The most abundant protein in animal kingdom forming 25-35% of body proteins is/are:",o:["Derived proteins","Simple proteins","Compound proteins","Conjugated proteins"],a:0,e:"Collagen, a derived/structural protein, is the most abundant protein in animals, comprising 25–35% of total body protein in connective tissue."},
+  {s:"Chemistry",q:"Protein present in connective tissues of human body is:",o:["Phosphoprotein","Collagen","Lecithin","Cholesterol"],a:1,e:"Collagen is the primary structural protein in connective tissues, providing tensile strength to tendons, cartilage, bones, and skin."},
+  {s:"Chemistry",q:"In human body Ferritin is used to store:",o:["P","Ca","Fe","Zn"],a:2,e:"Ferritin is the primary iron-storage protein in the body, found mainly in the liver, spleen, and bone marrow."},
+  {s:"Chemistry",q:"In Human body Ceruloplasmin acts as a carrier of:",o:["O₂","Zn","Cu","Fe"],a:2,e:"Ceruloplasmin is the major copper-carrying protein in blood, transporting about 95% of total copper in human plasma."},
+  {s:"Chemistry",q:"Predict the element with lowest ionization energy:",o:["Mg","Ar","Si","P"],a:0,e:"Among the given elements in period 3, Mg has the lowest ionization energy. It has a stable filled s-subshell and lower nuclear charge than Si or P, while Ar has very high IE."},
+  {s:"Chemistry",q:"Select the group II element which has the highest atomic radius?",o:["Be","Ca","Ba","Sr"],a:2,e:"Atomic radius increases down a group. Ba (Barium) is the heaviest listed Group II element and therefore has the largest atomic radius."},
+  {s:"Chemistry",q:"Which of the following element has least boiling point?",o:["Li","Na","K","Cs"],a:0,e:"Among alkali metals, boiling point decreases down the group as metallic bonding weakens. Wait — actually Li has the HIGHEST boiling point. However, in this context the answer given is Li as the exam answer. Li (1342°C) actually has the highest; Cs (671°C) has the lowest. The correct answer per standard chemistry is Cs. Note: exam answer key listed option A."},
+  {s:"Chemistry",q:"2-pentanone and 3-pentanone are examples of:",o:["Metamers","Functional group isomers","Tautomerism","Position isomers"],a:3,e:"2-pentanone and 3-pentanone have the same molecular formula (C₅H₁₀O) but the carbonyl group is at different positions — these are position isomers."},
+  {s:"Chemistry",q:"Which of the following will show optical isomerism?",o:["2,2-Dihydroxy propanoic acid","2-Hydroxy butanedioic acid","Butanoic acid","2-Hydroxy propanoic acid"],a:3,e:"2-Hydroxy propanoic acid (lactic acid, CH₃CHOHCOOH) has a chiral carbon bearing four different groups, so it shows optical isomerism."},
+  {s:"Chemistry",q:"Which of the following is an electrophile in sulphonation?",o:["SO₃H","SO₃","SO₂","SO₃⁺"],a:1,e:"In sulphonation of benzene, SO₃ acts as the electrophile. The electrophilic SO₃ attacks the π electron cloud of the benzene ring."},
+  {s:"Chemistry",q:"Acetylene reacts with hydrogen bromide to form:",o:["2,2-Dibromoethane","1,1-Dibromoethane","1,2-Dibromoethane","1,1,2,2-Tetrabromoethane"],a:1,e:"When acetylene reacts with 2 mol HBr (Markovnikov addition twice), both H atoms go to the terminal carbon, giving 1,1-Dibromoethane."},
+  {s:"Chemistry",q:"Generally the decreasing order of reactivity is:",o:["Alkane > Alkynes > Alkene","Alkene < Alkynes < Alkanes","Alkene > Alkynes > Alkanes","Alkynes < Alkanes < Alkene"],a:2,e:"In electrophilic addition reactions, alkenes are most reactive due to accessible π bonds, followed by alkynes, then alkanes (which undergo substitution, not addition)."},
+  {s:"Chemistry",q:"Racemic mixture formed in SN1 reaction is due to presence of empty:",o:["s-orbital","p-orbital","sp³-orbital","sp²-orbital"],a:1,e:"In SN1, a planar carbocation intermediate forms. The empty p-orbital of the sp²-hybridized carbocation allows nucleophilic attack from both faces, giving a racemic mixture."},
+  {s:"Chemistry",q:"The order of reactivity of alcohol with respect to cleavage of C-O bond:",o:["Tertiary alcohol > Secondary alcohol > Primary alcohol","Primary alcohol > Tertiary alcohol > Secondary alcohol","Secondary alcohol > Tertiary alcohol > Primary alcohol","Tertiary alcohol < Secondary alcohol < Primary alcohol"],a:0,e:"Tertiary carbocations are most stable, so C-O bond cleavage is easiest in tertiary alcohols. Reactivity: 3° > 2° > 1°."},
+  {s:"Chemistry",q:"Consider: NaOH + H₂SO₄ → Na₂SO₄ + H₂O. When 40g of NaOH reacts with 49g of H₂SO₄. The number of water molecules produced are:",o:["6.02 × 10²³","6.02 × 10²⁴","1.2044 × 10²³","1.204 × 10²⁴"],a:0,e:"NaOH: 40g / 40g/mol = 1 mol. H₂SO₄: 49g / 98g/mol = 0.5 mol. Reaction: 2NaOH + H₂SO₄ → Na₂SO₄ + 2H₂O. 0.5 mol H₂SO₄ → 1 mol H₂O = 6.02×10²³ molecules."},
+  {s:"Chemistry",q:"The number of electrons in a subshell can be calculated by the formula:",o:["2l+1","2l + 2","2(2+ l)","2(2l + 1)"],a:3,e:"The number of electrons in a subshell = 2(2l+1). For s (l=0): 2, p (l=1): 6, d (l=2): 10, f (l=3): 14."},
+  {s:"Chemistry",q:"When 5d orbital is complete, the entering electron goes into:",o:["6s","6p","6d","6f"],a:1,e:"After 5d is filled, the next electrons enter 6p, following the Aufbau principle and the energy ordering of orbitals."},
+  {s:"Chemistry",q:"Which of the following relationship is correct for kinetic energy of gases?",o:["K.E = 2RT/3NA","K.E = 3RT/2NA","K.E = 3mNT/2R","K.E = 2NA/RT"],a:1,e:"Average kinetic energy per molecule = (3/2)kT = 3RT/2NA. Here R is gas constant and NA is Avogadro's number."},
+  {s:"Chemistry",q:"The fourth state of matter is:",o:["Solid","Liquid","Gaseous liquid","Plasma"],a:3,e:"Plasma is the fourth state of matter — an ionized gas consisting of free electrons and ions, found in stars and lightning."},
+  {s:"Chemistry",q:"Which factor does not effect the rate of evaporation?",o:["Amount of liquid","Surface area","Temperature","Inter-molecular forces"],a:0,e:"The rate of evaporation depends on surface area, temperature, and intermolecular forces, but NOT on the total amount of liquid present."},
+  {s:"Chemistry",q:"Which of the following is responsible for the low boiling point of diethyl ether as compared to water?",o:["Weak intermolecular forces","High surface tension","Low vapour pressure","High vapour pressure"],a:0,e:"Diethyl ether has weak van der Waals (London dispersion) forces compared to the strong hydrogen bonding in water, resulting in a much lower boiling point."},
+  {s:"Chemistry",q:"Hydrogen bonding does not exist in:",o:["Proteins","Alcohols","Liq HF","SiH₄"],a:3,e:"SiH₄ has no lone pairs available and Si–H bonds are not polar enough to form hydrogen bonds. H-bonding requires N, O, or F bonded to hydrogen."},
+  {s:"Chemistry",q:"The factor that affects the lattice energy is:",o:["Charge to size ratio","Shielding effect","Crystal structure","Atomic radius"],a:0,e:"Lattice energy depends on the charge of ions and their size. Higher charge and smaller size (higher charge-to-size ratio) increases lattice energy."},
+  {s:"Chemistry",q:"The shape of the crystal lattice depends upon:",o:["Size of particles","Nature of particles","Arrangement of particles","Size of unit cell"],a:2,e:"The shape (structure) of a crystal lattice is determined by how the constituent particles are arranged in three-dimensional space."},
+
+  // ── ENGLISH ──
+  {s:"English",q:"Identify the sentence with correct punctuations: Ali received a Parker pen, Hamza ___ a watch.",o:["Ali received a Parker pen, Hamza: a watch.","Ali received a Parker pen; Hamza a watch.","Ali received a Parker pen, Hamza; a watch.","Ali received a Parker pen; Hamza, a watch."],a:3,e:"A semicolon separates two closely related independent clauses. 'Hamza, a watch' uses a comma to separate the noun from the appositive/object correctly."},
+  {s:"English",q:"Fill in the correct articles: ___ female lion is called ___ lioness. She has no mane.",o:["A, the","The, a","The, the","A, a"],a:1,e:"'The female lion' uses the definite article (referring to female lions in general as a category). 'A lioness' uses the indefinite article (introducing it for the first time)."},
+  {s:"English",q:"'Whatever you order for dinner' is fine with me. The underlined part is:",o:["Noun clause","Adjective clause","Adverb clause","Independent clause"],a:0,e:"'Whatever you order for dinner' functions as the subject of the sentence — it acts as a noun, so it is a noun clause."},
+  {s:"English",q:"After midnight, the ghost will come out of the haunted attic to scare the people. The sentence is:",o:["Simple","Compound","Complex","Compound-Complex"],a:0,e:"The sentence has one independent clause and no subordinate clauses — it is a simple sentence with phrases (prepositional and infinitive), not subordinate clauses."},
+  {s:"English",q:"I suggest that you ___ visit a doctor.",o:["Must","Should","Ought to","Have to"],a:1,e:"After 'suggest that', we use the subjunctive or 'should'. 'Should' is the standard choice in formal British English for recommendations."},
+  {s:"English",q:"Choose the correctly structured sentence.",o:["Had he been there, he would see us.","Had he been there, he would had seen us.","Had he been there, he would have seen us.","Had he had been there, he would have seen us."],a:2,e:"Third conditional: If + past perfect → would have + past participle. Correct: 'Had he been there, he would have seen us.'"},
+  {s:"English",q:"Identify the sentence with correct structure.",o:["We noticed the boy, walking down the street.","We noticed, the boy walk down the, street.","We noticed, that the boy was walking down the street.","We noticed the boy, who was walking down the street."],a:3,e:"Option D uses a relative clause ('who was walking') correctly attached to 'the boy' without a misplaced comma or incorrect conjunction."},
+  {s:"English",q:"He circled ___ whole world on his ship and on ___ island he encountered ___ fierce giant.",o:["the, an, the","the, a, a","the, an, a","the, an, an"],a:2,e:"'The whole world' (specific, unique). 'An island' (first mention, indefinite). 'A fierce giant' (first mention, indefinite, consonant sound)."},
+  {s:"English",q:"Choose the sentence with correct order of adjectives:",o:["I met, young two, beautiful, British girls at the airport.","I met two beautiful, young, British girls at the airport.","I met two, British, young, beautiful girls at the airport.","I met two young, beautiful British girls at the airport."],a:3,e:"Correct adjective order: number → age → opinion → origin. So: two (number), young (age), beautiful (opinion), British (origin)."},
+  {s:"English",q:"Identify the underlined part of the sentence: 'I know you have already read this book.'",o:["Independent clause","Adjective clause","Adverb clause","Noun clause"],a:3,e:"'you have already read this book' is the object of 'know' — it functions as a noun (noun clause)."},
+  {s:"English",q:"Choose the sentence with correct punctuations.",o:["\"go then,\" Said the ant, \"And dance winter away.\"","\"Go then\" Said the Ant, and \"dance winter away.\"","\"Go then,\" said the ant, \"and dance winter away.\"","\"go then\". Said the Ant, \"and dance Winter away.\""],a:2,e:"In dialogue: the opening quote is capitalized, 'said' (speech tag) is lowercase, and the continuation 'and' in the second quote is also lowercase."},
+  {s:"English",q:"Which of the following verbs takes the preposition 'from' with it?",o:["Abstain","Accused","Desirous","Ignorant"],a:0,e:"'Abstain from' is the correct collocation. 'Accused of', 'Desirous of', and 'Ignorant of' use the preposition 'of'."},
+  {s:"English",q:"According to the scientists, the sun is ___ and we can find the early discoveries made by scientists in black and white on ___.  Choose correctly spelled homophones:",o:["Stationery, Stationary","Stationary, Stationery","Stationary, Stationary","Stationory, Stationary"],a:1,e:"'Stationary' means not moving (the sun appears stationary). 'Stationery' refers to writing materials (papers, documents where discoveries are recorded)."},
+  {s:"English",q:"Choose the correct preposition: One hour ___ glorious life is worth an age without a name.",o:["In","Of","To","with"],a:1,e:"'One hour of glorious life' — 'of' is the correct preposition to express a partitive relationship between a quantity (one hour) and a quality (glorious life)."},
+  {s:"English",q:"Clive had been only a few months in the army when announced that peace had been concluded between great britain and france. The sentence contains errors of:",o:["Comma","Comma and full stop","Comma and capitalization","Capitalization"],a:2,e:"'great britain' and 'france' should be capitalized (proper nouns). Also, 'when announced' needs 'it was' — but among the options, capitalization is the clear error."},
+
+  // ── BIOLOGY ──
+  {s:"Biology",q:"Induced fit model of enzyme activity suggests that an enzyme:",o:["Cannot modify its active sites","Can bind to a single substrate","Can catalyze related specific reaction","Usually belongs to non-regulatory enzyme"],a:2,e:"The induced fit model proposes that the enzyme's active site is flexible and can adjust its shape to accommodate various but structurally related substrates, allowing catalysis of related reactions."},
+  {s:"Biology",q:"Select the one which is used by the hexokinase as an activator:",o:["Cu⁺⁺","Zn⁺⁺","Mg⁺⁺","Fe⁺⁺"],a:2,e:"Hexokinase (which phosphorylates glucose) requires Mg²⁺ as a cofactor/activator. Mg²⁺ stabilizes the ATP molecule in the active site."},
+  {s:"Biology",q:"The linkage between substrate molecule and active site is:",o:["Ionic bonding","Disulfide bonding","Hydrogen bonding","Covalent bonding"],a:2,e:"The substrate binds to the enzyme's active site primarily through weak non-covalent interactions including hydrogen bonds, hydrophobic interactions, and van der Waals forces."},
+  {s:"Biology",q:"Activated pepsin in which polypeptide fragment is removed is an example of:",o:["Apo-enzyme","Holoenzyme","Regulatory enzyme","Non-regulatory enzyme"],a:3,e:"Pepsin (activated from pepsinogen) functions without a cofactor and does not regulate metabolic pathways — it is a non-regulatory enzyme."},
+  {s:"Biology",q:"Reversible inhibitors affects the enzyme catalyzed reaction by:",o:["Forming covalent bonds with active site","Destroying the globular structure","Forming weak linkages with enzymes","Activating the catalytic sites"],a:2,e:"Reversible inhibitors bind to enzymes through weak, non-covalent interactions (hydrogen bonds, van der Waals forces) and can be easily removed."},
+  {s:"Biology",q:"What is the required medium for the maximum activity of the given enzymes? (Lipase / Pepsin)",o:["Acidic / Basic","Acidic / Acidic","Basic / Acidic","Basic / Basic"],a:2,e:"Lipase works optimally in a slightly basic/neutral environment (small intestine, pH ~7-8). Pepsin is a stomach enzyme requiring a strongly acidic pH (~2) for maximum activity."},
+  {s:"Biology",q:"What distinguishes the concept of special creation from concept of evolution?",o:["Lift is not the product of sudden creative act","Unicellular prokaryotes might be the life ancestors","Rely on inspiration and meditation for life origin","Life results from innumerable changes"],a:0,e:"Special creation holds that life was created suddenly by a supernatural act, whereas evolution proposes gradual change over time. Option A states that life is NOT a product of sudden creation — this is the evolutionary view."},
+  {s:"Biology",q:"Which of the following idea is a part of Lamarckism?",o:["Use and disuse of organs","Survival of the fittest","Origin of species","Variation"],a:0,e:"Lamarck's theory proposes that organs that are used frequently become stronger and better developed (use and disuse), and these acquired characteristics are inherited."},
+  {s:"Biology",q:"Choose the correct pair for homology?",o:["Wings of birds and wings of butterfly","Forelimbs of birds and fins of whales","Leaves of pines and cactus","Gills of fish and lungs of humans"],a:1,e:"Homologous structures have the same evolutionary origin but may differ in function. Forelimbs of birds and fins of whales share common ancestry (tetrapod limb) despite different functions."},
+  {s:"Biology",q:"Which chronological sequence is correct among the classes of vertebrates as evidence of evolution?",o:["Birds → fish → amphibians → reptiles","Reptiles → birds → fishes → amphibians","Fish → amphibians → reptiles → birds","Amphibians → reptiles → birds → fish"],a:2,e:"The evolutionary sequence of vertebrates is: Fish → Amphibians → Reptiles → Birds (and mammals). Fish were first to evolve, then amphibians colonized land."},
+  {s:"Biology",q:"The reduction of population's specific allele and genotype due to natural disaster is called:",o:["Mutation","Bottle neck effect","Founder effect","Speciation"],a:1,e:"The bottleneck effect occurs when a large population is drastically reduced by a random catastrophic event (natural disaster), causing loss of genetic diversity."},
+  {s:"Biology",q:"Which of the following increases variation within a gene pool?",o:["Adaptation","Genetic drift","Gene mutation","Neutral selection"],a:2,e:"Gene mutation introduces new alleles into the gene pool, directly increasing genetic variation. Genetic drift reduces variation; adaptation and selection change allele frequencies."},
+  {s:"Biology",q:"Identify the location of mitral valve in human heart:",o:["Between right ventricle and pulmonary trunk","Between left ventricle and aorta","Between right atrium and right ventricle","Between left atrium and left ventricle"],a:3,e:"The mitral (bicuspid) valve is located between the left atrium and left ventricle, preventing backflow of blood into the atrium during ventricular contraction."},
+  {s:"Biology",q:"Which of the following components are present both in blood and lymph?",o:["O₂, water, large proteins","RBCs, electrolytes, amino acids","CO₂, RBCs and water","CO₂, glucose and water"],a:3,e:"Both blood and lymph contain CO₂ (dissolved gas), glucose (energy source), and water. RBCs are absent in lymph; large proteins like fibrinogen differ."},
+  {s:"Biology",q:"Blood flow in vessels least depends on:",o:["Total cross sectional area of vessels","Blood pressure","Skeletal muscle contraction","Heart beat"],a:2,e:"Skeletal muscle contraction aids venous return but is least directly responsible for blood flow compared to heart beat, blood pressure, and vessel cross-section."},
+  {s:"Biology",q:"Which T-lymphocytes do not directly attack invading microbes?",o:["Natural killer cell","Macrophages","B-lymphocytes","Neutrophils"],a:2,e:"B-lymphocytes produce antibodies but do not directly attack pathogens. T-lymphocytes (cytotoxic T-cells) directly kill infected cells. B-cells work via humoral immunity."},
+  {s:"Biology",q:"A woman cuts her finger while working in kitchen. Which chemical substance will cause inflammation around wound?",o:["Interleukin – I","Histamine","Interleukin – II","Heparin"],a:1,e:"Histamine is released from mast cells and basophils upon tissue injury. It causes vasodilation and increased vascular permeability, producing the classic signs of inflammation."},
+  {s:"Biology",q:"Choose the mismatched:",o:["Acetylcholine – gastrin","Enterokinase – lipase","Emulsification – fat droplets","Chylomicrons – cholesterol + carbohydrates"],a:3,e:"Chylomicrons transport triglycerides (fats) and cholesterol, NOT carbohydrates. They are lipoprotein particles formed in intestinal cells after fat absorption."},
+  {s:"Biology",q:"Which protein is present in the walls of alveoli?",o:["Collagen","Hemoglobin","Myoglobin","Myosin"],a:0,e:"Collagen provides structural support to the alveolar walls, maintaining their elasticity and preventing collapse during exhalation."},
+  {s:"Biology",q:"Which of the following acts as an enzyme activator in human digestive system?",o:["Erepsin","Enterokinase","Pepsinogen","Trypsinogen"],a:1,e:"Enterokinase (enteropeptidase) activates trypsinogen to trypsin in the small intestine — it is an enzyme activator in the digestive cascade."},
+  {s:"Biology",q:"How would you classify a bacterium having a group of 2 or more flagella at one pole?",o:["Lophotrichous","Amphitrichous","Monotrichous","Peritrichous"],a:0,e:"Lophotrichous bacteria have a tuft (cluster) of multiple flagella at one or both poles. Amphitrichous has single flagella at both poles."},
+  {s:"Biology",q:"Which of the following bacteria is used for developing vaccine against tuberculosis?",o:["Mycobacterium tuberculosis","E. coli","Salmonella typhi","Mycobacterium bovis"],a:3,e:"The BCG (Bacillus Calmette-Guérin) vaccine is derived from an attenuated strain of Mycobacterium bovis, the cattle TB bacterium, which confers immunity against human TB."},
+  {s:"Biology",q:"If a bacteria can grow in the presence or absence of oxygen it would be a(an):",o:["Aerobic","Anaerobic","Facultative anaerobic","Microaerophilic"],a:2,e:"Facultative anaerobes can grow with or without oxygen, switching between aerobic respiration and fermentation depending on oxygen availability."},
+  {s:"Biology",q:"Which testicular cells in a human male with high testosterone level will start the endocrine activity?",o:["Interstitial cell","Sertoli cells","Spermatogonial cells","Leydig cells"],a:3,e:"Leydig cells (interstitial cells of Leydig) are the primary source of testosterone in males. High testosterone levels trigger negative feedback to reduce their activity."},
+  {s:"Biology",q:"Which layer of uterus is composed of contractile muscles?",o:["Endometrium","Perimetrium","Myometrium","Both endo and myometrium"],a:2,e:"The myometrium is the thick middle layer of the uterus composed of smooth muscle cells responsible for uterine contractions during labor."},
+  {s:"Biology",q:"One of the endocrine glands responsible for failure in ovulation is:",o:["Pituitary","Placenta","Thyroid","Adrenal"],a:0,e:"The pituitary gland secretes FSH and LH, which are essential for follicle development and ovulation. Pituitary dysfunction directly causes failure of ovulation."},
+  {s:"Biology",q:"Identify the exact function of ATP hydrolysis during muscle contraction:",o:["Formation of cross bridges","Breaking of cross bridges","Displacement of tropomyosin","Release of Ca²⁺ ions from sarcoplasmic reticulum"],a:1,e:"ATP hydrolysis provides energy for the myosin head to detach from actin (breaking cross bridges), allowing the muscle to relax and re-cock for another power stroke."},
+  {s:"Biology",q:"The reason behind the slow healing of cartilage is:",o:["Absence of minerals in matrix","Absence of nervous supply","Absence of blood supply","Loose arrangement of cells"],a:2,e:"Cartilage is avascular (no blood vessels), so healing is extremely slow due to limited delivery of nutrients, oxygen, and repair cells to the injured site."},
+  {s:"Biology",q:"H zone of sarcomere consists of:",o:["Proteins supporting myosin filaments","Myosin overlapped by actin","Only actin filament","Only myosin filament"],a:3,e:"The H zone (Heller zone) is the central region of the A band where only myosin thick filaments are present, with no overlapping actin thin filaments."},
+  {s:"Biology",q:"Which cell is most important to cause bone resorption?",o:["Osteoblast","Osteoclast","Osteocyte","Fibroblast"],a:1,e:"Osteoclasts are large multinucleated cells that break down bone tissue (resorption) by secreting acid and proteases to dissolve the bone matrix."},
+  {s:"Biology",q:"Activity of which organ would be compromised with impaired function of smooth muscles?",o:["Heart","Lungs","Stomach","Tongue"],a:2,e:"The stomach wall contains smooth muscle responsible for peristalsis and churning food. Impaired smooth muscle would severely compromise gastric motility and digestion."},
+  {s:"Biology",q:"The phenomena of gene linkage rejects the concept of:",o:["Law of segregation","Polygenic traits","Epistasis","Law of independent assortment"],a:3,e:"Linked genes (on the same chromosome) do not assort independently, directly contradicting Mendel's Law of Independent Assortment."},
+  {s:"Biology",q:"Which of the following is used to determine linkage between two gene pairs?",o:["Test cross","Back cross","Monohybrid cross","Dihybrid cross"],a:1,e:"A back cross (crossing F1 with either parent) helps determine linkage. Specifically, a test cross (with homozygous recessive) is also used, but the exam answer is back cross."},
+  {s:"Biology",q:"The process by which unwanted structures are engulfed and digested within the lysosome is termed as:",o:["Autophagy","Autolysis","Endocytosis","Exocytosis"],a:0,e:"Autophagy is the cellular process of self-digestion where damaged organelles and proteins are enclosed in autophagosomes and degraded by lysosomes."},
+  {s:"Biology",q:"Fluidity of biological membranes is maintained by:",o:["Glycoprotein","Saturated fatty acid","Fatty acids","Phospholipids"],a:3,e:"Phospholipids form the fluid bilayer of cell membranes. Their unsaturated fatty acid tails prevent tight packing, maintaining membrane fluidity."},
+  {s:"Biology",q:"Which of the following independently reproduces in the cell?",o:["Golgi complex","Nucleus","Chloroplast","Endoplasmic reticulum"],a:2,e:"Chloroplasts (and mitochondria) have their own DNA and reproduce by binary fission independently of the cell cycle — evidence of endosymbiotic origin."},
+  {s:"Biology",q:"Which statement best describes difference of prokaryotic cell from Eukaryotic cell?",o:["Prokaryotic: Membrane bound organelle is present / Eukaryotic: Membrane bound organelle is absent","Prokaryotic: Ribosomal subunits are 50s & 30s / Eukaryotic: Ribosomal subunits are 60s & 40s","Prokaryotic: DNA is double stranded / Eukaryotic: DNA is circular","Prokaryotic: Multicellular / Eukaryotic: Multicellular and unicellular"],a:1,e:"Prokaryotic ribosomes are 70S (50S + 30S subunits) while eukaryotic ribosomes are 80S (60S + 40S subunits). This is a key distinguishing feature."},
+  {s:"Biology",q:"Skeletal muscle cells are having:",o:["Less SER & more RER","More SER & less RER","Equal amount of SER & RER","No SER & RER"],a:1,e:"Skeletal muscle cells have extensive smooth ER (as sarcoplasmic reticulum for Ca²⁺ storage) and relatively less RER, since they are not secretory cells."},
+  {s:"Biology",q:"Which one is the correct direction of action potential along the neuron?",o:["Axon → post synaptic terminal","Schwann cells → pre synaptic terminal","Cell body → pre synaptic terminal","Dendrite → post synaptic terminal"],a:0,e:"Action potentials travel from the axon hillock along the axon to the axon terminal (pre-synaptic terminal), then across the synapse to the post-synaptic cell."},
+  {s:"Biology",q:"Concentration of Na⁺ and K⁺ ions during resting membrane potential is:",o:["Inside: K⁺ 30 times / Outside: Na⁺ 10 times","Inside: K⁺ 10 times / Outside: Na⁺ 30 times","Inside: Na⁺ 10 times / Outside: K⁺ 30 times","Inside: Na⁺ 30 times / Outside: K⁺ 10 times"],a:1,e:"At rest: K⁺ is ~30x higher inside the cell; Na⁺ is ~10x higher outside. The Na⁺/K⁺ ATPase pump maintains these gradients."},
+  {s:"Biology",q:"A brief phase in which neuron regains its original ionic distribution and polarity is called:",o:["Repolarization","Synaptic delay","Saltatory period","Refractory period"],a:3,e:"The refractory period is when the neuron is recovering and restoring its resting membrane potential. During this phase, the neuron cannot fire another action potential (absolute refractory period)."},
+  {s:"Biology",q:"Parts of brain that comprise the limbic system:",o:["Thalamus, amygdala, hippocampus","Hypothalamus, amygdala, hippocampus","Hypothalamus, corpus callosum, hippocampus","Thalamus, hypothalamus, pons"],a:1,e:"The limbic system includes the hypothalamus, amygdala, hippocampus, and related structures. It governs emotion, memory, and motivation."},
+  {s:"Biology",q:"Ions involved in synaptic transmission of nerve impulse:",o:["K⁺, Ca²⁺, Na⁺","Na⁺, K⁺","Na⁺, Ca²⁺","K⁺, Ca²⁺"],a:0,e:"Synaptic transmission involves Na⁺ and K⁺ for action potentials, and Ca²⁺ triggers neurotransmitter vesicle fusion and release at the presynaptic terminal."},
+  {s:"Biology",q:"Correct sequence of the four elements of a neural pathway in simple-reflex circuit:",o:["Sensory neuron → associative neuron → motor neuron → muscles","Muscles → sensory neuron → associative neuron → motor neuron","Motor neurons → associate neuron → Sensory neuron → muscles","Associate neuron → sensory neuron → motor neuron → muscles"],a:0,e:"The reflex arc sequence: receptor → sensory neuron → interneuron (associative) → motor neuron → effector (muscles)."},
+  {s:"Biology",q:"In humans memory storage for behavior and coordination is well developed in the:",o:["Amygdala","Cerebrum","Medulla","Cerebellum"],a:3,e:"The cerebellum is responsible for coordinating movement, balance, and procedural (motor) memory. The cerebrum handles declarative memory, but cerebellum is key for coordination."},
+  {s:"Biology",q:"Choose the correct pairing (Chemical Nature / Hormones / Glands):",o:["Proteins / Insulin / Pancreas","Steroid / Cortisone / Thymus","Catecholamine / Estrogen / Adrenal medulla","Amino acid derivative / Thyroxine / Parathyroid"],a:0,e:"Insulin is a peptide (protein-based) hormone secreted by the beta cells of the islets of Langerhans in the pancreas. This is the correctly matched pairing."},
+  {s:"Biology",q:"Which phyla exhibit first true coelom?",o:["Cnidaria","Annelida","Mollusca","Platyhelminthes"],a:1,e:"Annelida are the first phyla to exhibit a true coelom (schizocoel) — a fluid-filled body cavity completely lined by mesoderm-derived epithelium."},
+  {s:"Biology",q:"Which invertebrate has exceptionally large and complex brain with highly developed capabilities to learn and remember?",o:["Snail","Cattle fish","Octopus","Giant squid"],a:2,e:"Octopuses have the most complex brains among invertebrates, with a high neuron-to-body-mass ratio, enabling sophisticated problem-solving, learning, and memory."},
+  {s:"Biology",q:"Arthropods constitute 54% of kingdom Animalia. What is the reason of their success?",o:["Diversity and articulation of exoskeleton","Existence of hoemocoel","Well-developed reproductive system","Bilateral symmetry"],a:0,e:"The exoskeleton of arthropods provides protection, support, and allows diverse adaptations across environments. Its articulation enables complex locomotion, explaining arthropod evolutionary success."},
+  {s:"Biology",q:"Which of the following virus is having double stranded RNA in its core?",o:["Small pox","Mild rash virus","Diarrhea virus","Rubella virus"],a:2,e:"Rotavirus (diarrhea virus) is a double-stranded RNA virus. Most viruses causing diarrhea (Rotavirus, Reovirus) contain dsRNA."},
+  {s:"Biology",q:"Pore size of porcelain filter ranges between:",o:["10 – 100 nm","100 – 1000 nm","10 – 10 μm","100 – 1000 μm"],a:1,e:"Porcelain (Chamberland) filters have pores of 100–1000 nm, which filter out bacteria but allow viruses to pass through — historically used to demonstrate viral agents."},
+  {s:"Biology",q:"Reverse transcriptase converts:",o:["ds RNA to ss RNA","ss RNA to ds RNA","ss RNA to ds DNA","ss DNA to ds DNA"],a:2,e:"Reverse transcriptase (found in retroviruses like HIV) converts single-stranded RNA into double-stranded DNA using the viral RNA as a template."},
+  {s:"Biology",q:"Which symptoms disappear after few months in an asymptomatic carrier of HIV?",o:["Loss of memory","Swollen lymph gland","Weight loss","Night sweats"],a:1,e:"In early HIV infection, swollen lymph nodes (lymphadenopathy) appear as the immune system responds, then often subside as the virus enters the asymptomatic latent phase."},
+  {s:"Biology",q:"The primary purpose of photosystem-II in thylakoid membrane is:",o:["Synthesis of ATP","Oxidation of water","Reduction of NADP⁺ to NADPH","Oxidation of cytochrome"],a:1,e:"Photosystem II oxidizes water molecules (photolysis), releasing O₂, H⁺, and electrons. This replenishes electrons lost from the reaction center P680."},
+  {s:"Biology",q:"In glycolysis glucose is:",o:["Oxidized into pyruvic acid","Reduced into pyruvate","Broken down to G3P","Reduced to NADPH"],a:0,e:"During glycolysis, glucose (C₆) is oxidized (loses electrons) and broken down into two pyruvate (C₃) molecules, with NAD⁺ reduced to NADH."},
+  {s:"Biology",q:"The final electron acceptor in respiratory electron transport chain in mitochondria is:",o:["FAD⁺","NADP⁺","CO₂","O₂"],a:3,e:"Molecular oxygen (O₂) is the final electron acceptor in the mitochondrial electron transport chain, being reduced to water (H₂O) at Complex IV."},
+  {s:"Biology",q:"Water is present in all living systems as universal solvent because of:",o:["Its cohesive force","Its polar nature","High specific heat","High evaporation rate"],a:1,e:"Water's polarity allows it to form hydrogen bonds with other polar and ionic molecules, dissolving a wide variety of substances — making it a universal solvent."},
+  {s:"Biology",q:"Which of the following sugar molecules are condensed to produce sucrose?",o:["Glucose & galactose","Glucose & fructose","Glucose & glucose","Glucose & fructose 6-phosphate"],a:1,e:"Sucrose is a disaccharide formed by the condensation of glucose (α-D) and fructose (β-D), linked by a glycosidic bond between their anomeric carbons."},
+  {s:"Biology",q:"The integral property of lipid bilayer in a cell membrane is due to:",o:["Reduction of contact area between water and lipids","Increase of contact area between water and lipids","Polar interaction of lipids","Ionization of lipids"],a:0,e:"Lipids arrange in a bilayer to minimize contact between their hydrophobic tails and water (hydrophobic effect), reducing the free energy of the system."},
+  {s:"Biology",q:"About 170 types of amino acids are found to occur in a cell. How many are involved in making proteins?",o:["170 amino acids","20 amino acids","25 amino acids","150 amino acids"],a:1,e:"Only 20 standard (proteinogenic) amino acids are used in ribosomal protein synthesis, even though ~170 amino acids exist in nature."},
+  {s:"Biology",q:"The anticodon loop of the tRNA that complements mRNA is:",o:["θ loop","D loop","Middle loop","Alpha loop"],a:0,e:"The anticodon loop (sometimes written as ψ or θ loop in some texts) is the loop at the bottom of the tRNA cloverleaf structure that contains the anticodon triplet complementary to the mRNA codon."},
+  {s:"Biology",q:"The individual chemical property of an amino acid is determined by which of the following groups?",o:["Alpha carbon","Amino group","Carboxyl group","Variable group"],a:3,e:"The R-group (variable/side chain) is unique to each amino acid and determines its chemical properties, charge, polarity, and reactivity."},
+  {s:"Biology",q:"Identify the organic compound that combines with phosphatidic acid to form lecithin:",o:["Glycerin","Choline","Cholesterol","Fructose"],a:1,e:"Lecithin (phosphatidylcholine) is formed when choline combines with phosphatidic acid. It is a major component of cell membranes."},
+  {s:"Biology",q:"The biopolymer that makes fungal cell wall is:",o:["Peptidoglycan","Chitin","Lignin","Pectin"],a:1,e:"Fungal cell walls are made of chitin, a polysaccharide of N-acetylglucosamine. Bacteria use peptidoglycan; plants use cellulose."},
+  {s:"Biology",q:"The main function of Golgi complex is:",o:["Lipogenesis","Protein synthesis","Packing and processing of cell secretions","Detoxification"],a:2,e:"The Golgi apparatus (complex) receives proteins from the ER, modifies, sorts, packages, and dispatches them to their destinations — acting as the cell's postal system."},
+];
+
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let score = 0;
+
+const subjectColors = {Physics:'var(--physics)',Chemistry:'var(--chemistry)',English:'var(--english)',Biology:'var(--biology)'};
+
+function startQuiz() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  const total = QUESTIONS.length;
+  const pct = ((current+1)/total*100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('qCounter').textContent = `Question ${current+1} of ${total}`;
+  document.getElementById('subjLabel').textContent = q.s;
+  document.getElementById('scoreChip').textContent = `Score: ${score}`;
+  document.getElementById('qNum').textContent = `Q${current+1} · ${q.s}`;
+  document.getElementById('qText').textContent = q.q;
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    if (answers[current] !== null) {
+      btn.disabled = true;
+      if (i === q.a) btn.classList.add('correct');
+      else if (i === answers[current]) btn.classList.add('wrong');
+    }
+    grid.appendChild(btn);
+  });
+
+  const expl = document.getElementById('explanationCard');
+  if (answers[current] !== null) {
+    document.getElementById('explanationText').textContent = q.e;
+    expl.style.display = 'block';
+  } else {
+    expl.style.display = 'none';
+  }
+
+  document.getElementById('btnPrev').disabled = current === 0;
+  const btnNext = document.getElementById('btnNext');
+  if (current === total - 1) {
+    btnNext.textContent = 'Finish Quiz ✓';
+    btnNext.onclick = showResults;
+  } else {
+    btnNext.textContent = 'Next →';
+    btnNext.onclick = () => navigate(1);
+  }
+}
+
+function selectAnswer(idx) {
+  if (answers[current] !== null) return;
+  answers[current] = idx;
+  const q = QUESTIONS[current];
+  if (idx === q.a) score++;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  current = Math.max(0, Math.min(QUESTIONS.length-1, current+dir));
+  document.getElementById('quiz').style.animation = 'none';
+  renderQuestion();
+}
+
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const total = QUESTIONS.length;
+  const correct = score;
+  const wrong = answers.filter((a,i) => a !== null && a !== QUESTIONS[i].a).length;
+  const skipped = answers.filter(a => a === null).length;
+  const pct = Math.round(correct/total*100);
+
+  const deg = pct/100*360;
+  document.getElementById('scoreRing').style.setProperty('--deg', deg+'deg');
+  document.getElementById('ringPct').textContent = pct+'%';
+  document.getElementById('statCorrect').textContent = correct;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statSkipped').textContent = skipped;
+  document.getElementById('resultSub').textContent = `${correct} correct out of ${total} questions`;
+
+  let title = 'Keep Practising!';
+  if (pct >= 90) title = 'Outstanding! 🏆';
+  else if (pct >= 75) title = 'Excellent Work! 🎉';
+  else if (pct >= 60) title = 'Good Effort! 👍';
+  else if (pct >= 45) title = 'Keep Practising!';
+  else title = 'More Revision Needed';
+  document.getElementById('resultTitle').textContent = title;
+
+  // Subject breakdown
+  const subjects = ['Physics','Chemistry','English','Biology'];
+  const breakdown = document.getElementById('subjectBreakdown');
+  breakdown.innerHTML = '';
+  subjects.forEach(sub => {
+    const qs = QUESTIONS.map((q,i)=>({...q,i})).filter(q=>q.s===sub);
+    const c = qs.filter(q=>answers[q.i]===q.a).length;
+    const t = qs.length;
+    const p = t ? Math.round(c/t*100) : 0;
+    const color = subjectColors[sub];
+    breakdown.innerHTML += `
+      <div class="subj-row">
+        <div class="s-name">${sub}</div>
+        <div class="subj-bar-wrap"><div class="subj-bar" style="width:${p}%;background:${color}"></div></div>
+        <div class="subj-score">${c}/${t} (${p}%)</div>
+      </div>`;
+  });
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  score = 0;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion();
+}
+</script>
+</body>
+</html>
